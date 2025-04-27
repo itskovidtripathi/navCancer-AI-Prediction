@@ -47,7 +47,7 @@ Here's a preview of the LungScan-AI application interface:
 
 1. Clone the repository:
 ```bash
-git clone [your-repo-url]
+git clone https://github.com/Code-sHimanshu/LungScan-AI.git
 cd LungScan-AI
 ```
 
