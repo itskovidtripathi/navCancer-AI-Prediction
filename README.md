@@ -8,6 +8,7 @@ LungScan-AI is a state-of-the-art medical imaging platform that harnesses the po
 ![Python](https://img.shields.io/badge/Python-3.11+-blue?style=for-the-badge&logo=python)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.31.0-red?style=for-the-badge&logo=streamlit)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.2.0-orange?style=for-the-badge&logo=pytorch)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ### ✨ Key Highlights
 - **High Accuracy**: 97.03% accurate in detecting lung cancer variants
@@ -143,4 +144,4 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 Copyright 2024 LungScan-AI
 
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) 
+ 
