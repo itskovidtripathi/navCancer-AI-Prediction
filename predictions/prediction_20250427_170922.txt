@@ -1,0 +1,10 @@
+
+                Timestamp: 2025-04-27 17:09:22
+                Predicted Class: Squamous Cell Carcinoma
+                Confidence: 51.2%
+                
+                Probability Distribution:
+                ------------------------------
+                Normal: 0.0%
+Squamous Cell Carcinoma: 51.2%
+Adenocarcinoma: 48.7%
