@@ -7,6 +7,24 @@ Advanced Lung Cancer Detection Using Artificial Intelligence
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.31.0-red?style=for-the-badge&logo=streamlit)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.2.0-orange?style=for-the-badge&logo=pytorch)
 
+🔗 [Try the Live Demo](https://lungscan-ai.streamlit.app/)
+
+## UI Preview
+
+Here's a preview of the LungScan-AI application interface:
+
+### User Registration
+![User Registration](docs/images/registration.png)
+*User registration interface for secure access*
+
+### Analysis Interface
+![Analysis Interface](docs/images/analysis.png)
+*X-ray upload and analysis interface showing probability distribution*
+
+### Detailed Results
+![Detailed Results](docs/images/results.png)
+*Detailed analysis results with key findings and recommendations*
+
 ## Features
 
 - Upload and analyze chest X-ray images
