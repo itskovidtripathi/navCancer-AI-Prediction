@@ -14,15 +14,15 @@ Advanced Lung Cancer Detection Using Artificial Intelligence
 Here's a preview of the LungScan-AI application interface:
 
 ### User Registration
-![User Registration](docs/images/registration.png)
+![User Registration](docs/ui_images/registration.png)
 *User registration interface for secure access*
 
 ### Analysis Interface
-![Analysis Interface](docs/images/analysis.png)
+![Analysis Interface](docs/ui_images/analysis.png)
 *X-ray upload and analysis interface showing probability distribution*
 
 ### Detailed Results
-![Detailed Results](docs/images/results.png)
+![Detailed Results](docs/ui_images/results.png)
 *Detailed analysis results with key findings and recommendations*
 
 ## Features
