@@ -1,5 +1,7 @@
 # LungScan-AI
 
+🔬 **Revolutionizing Lung Cancer Detection with AI**
+
 LungScan-AI is a state-of-the-art medical imaging platform that harnesses the power of deep learning to detect lung cancer with 97.03% accuracy. By analyzing chest X-rays in seconds, it provides healthcare professionals with rapid, reliable insights for early cancer detection and improved patient outcomes.
 
 ![LungScan-AI Logo](https://img.shields.io/badge/LungScan-AI-blue?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgMThjLTQuNDEgMC04LTMuNTktOC04czMuNTktOCA4LTggOCAzLjU5IDggOC0zLjU5IDgtOCA4eiIvPjwvc3ZnPg==)
@@ -7,13 +9,13 @@ LungScan-AI is a state-of-the-art medical imaging platform that harnesses the po
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.31.0-red?style=for-the-badge&logo=streamlit)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.2.0-orange?style=for-the-badge&logo=pytorch)
 
-🔗 [Try the Live Demo](https://lungscan-ai.streamlit.app/)
-
 ### ✨ Key Highlights
 - **High Accuracy**: 97.03% accurate in detecting lung cancer variants
 - **Instant Analysis**: Get comprehensive results in seconds
 - **Smart Reporting**: Detailed medical reports with actionable insights
 - **User-Friendly**: Intuitive interface for healthcare professionals
+
+🔗 [Try the Live Demo](https://lungscan-ai.streamlit.app/)
 
 ## UI Preview
 
@@ -53,7 +55,7 @@ Here's a preview of the LungScan-AI application interface:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/Code-sHimanshu/LungScan-AI.git
+git clone [your-repo-url]
 cd LungScan-AI
 ```
 
@@ -62,14 +64,16 @@ cd LungScan-AI
 pip install -r requirements.txt
 ```
 
-3. Set up environment variables:
-   - Create a `.env` file in the project root
-   - Add the following variables:
+3. Set up secrets:
+   - Copy `.streamlit/secrets.template.toml` to `.streamlit/secrets.toml`
+   - Fill in your credentials in `secrets.toml`:
+   ```toml
+   ADMIN_USERNAME = "your_admin_username"
+   ADMIN_PASSWORD = "your_secure_password"
+   DATABASE_PATH = "your_database_path"
+   MODEL_URL = "your_model_download_url"
    ```
-   ADMIN_USERNAME=your_admin_username
-   ADMIN_PASSWORD=your_secure_password
-   DATABASE_PATH=lung_cancer_app.db
-   ```
+   - Never commit `secrets.toml` to version control
 
 4. Ensure the model file is in the correct location:
 ```
@@ -124,6 +128,14 @@ streamlit run src/app.py
 - User data is stored securely in a local database
 - X-ray images are processed locally
 - No data is shared with external services
+
+## Security Notes
+
+- Never commit `.streamlit/secrets.toml` to version control
+- Use environment variables or secrets management for sensitive data
+- For Streamlit Cloud deployment, configure secrets in the Streamlit Cloud dashboard
+- Regularly rotate passwords and access credentials
+- Monitor access logs for suspicious activity
 
 ## License
 
