@@ -64,14 +64,16 @@ cd LungScan-AI
 pip install -r requirements.txt
 ```
 
-3. Set up environment variables:
-   - Create a `.env` file in the project root
-   - Add the following variables:
+3. Set up secrets:
+   - Copy `.streamlit/secrets.template.toml` to `.streamlit/secrets.toml`
+   - Fill in your credentials in `secrets.toml`:
+   ```toml
+   ADMIN_USERNAME = "your_admin_username"
+   ADMIN_PASSWORD = "your_secure_password"
+   DATABASE_PATH = "your_database_path"
+   MODEL_URL = "your_model_download_url"
    ```
-   ADMIN_USERNAME=your_admin_username
-   ADMIN_PASSWORD=your_secure_password
-   DATABASE_PATH=lung_cancer_app.db
-   ```
+   - Never commit `secrets.toml` to version control
 
 4. Ensure the model file is in the correct location:
 ```
@@ -126,6 +128,14 @@ streamlit run src/app.py
 - User data is stored securely in a local database
 - X-ray images are processed locally
 - No data is shared with external services
+
+## Security Notes
+
+- Never commit `.streamlit/secrets.toml` to version control
+- Use environment variables or secrets management for sensitive data
+- For Streamlit Cloud deployment, configure secrets in the Streamlit Cloud dashboard
+- Regularly rotate passwords and access credentials
+- Monitor access logs for suspicious activity
 
 ## License
 
