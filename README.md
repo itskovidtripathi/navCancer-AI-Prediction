@@ -9,7 +9,6 @@ LungScan-AI is a state-of-the-art medical imaging platform that harnesses the po
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.31.0-red?style=for-the-badge&logo=streamlit)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.2.0-orange?style=for-the-badge&logo=pytorch)
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)
-![View LICENSE](https://opensource.org/licenses/Apache-2.0)
 
 
 ### ✨ Key Highlights
