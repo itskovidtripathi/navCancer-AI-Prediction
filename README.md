@@ -1,6 +1,11 @@
-# Lung Cancer Detection System
+# LungScan-AI
 
-An AI-powered system for detecting lung cancer from chest X-ray images using deep learning.
+Advanced Lung Cancer Detection Using Artificial Intelligence
+
+![LungScan-AI Logo](https://img.shields.io/badge/LungScan-AI-blue?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgMThjLTQuNDEgMC04LTMuNTktOC04czMuNTktOCA4LTggOCAzLjU5IDggOC0zLjU5IDgtOCA4eiIvPjwvc3ZnPg==)
+![Python](https://img.shields.io/badge/Python-3.11+-blue?style=for-the-badge&logo=python)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.31.0-red?style=for-the-badge&logo=streamlit)
+![PyTorch](https://img.shields.io/badge/PyTorch-2.2.0-orange?style=for-the-badge&logo=pytorch)
 
 ## Features
 
@@ -25,7 +30,7 @@ An AI-powered system for detecting lung cancer from chest X-ray images using dee
 1. Clone the repository:
 ```bash
 git clone [your-repo-url]
-cd lung-cancer-detection
+cd LungScan-AI
 ```
 
 2. Install dependencies:

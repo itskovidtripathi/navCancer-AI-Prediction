@@ -12,13 +12,14 @@ from datetime import datetime
 import config
 from database import Database
 import re
+import requests
 
 # Initialize database
 db = Database()
 
 # Page configuration
 st.set_page_config(
-    page_title="Lung Cancer Detection System",
+    page_title="LungScan-AI",
     page_icon="🫁",
     layout="wide"
 )
@@ -60,12 +61,56 @@ st.markdown("""
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         margin: 20px 0;
     }
+    .logo-text {
+        font-size: 3em;
+        font-weight: 700;
+        background: linear-gradient(45deg, #3B4371, #F3904F);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-align: center;
+        padding: 20px 0;
+        font-family: 'Arial Black', sans-serif;
+    }
+    .logo-subtext {
+        text-align: center;
+        color: #666;
+        font-size: 1.2em;
+        margin-bottom: 30px;
+    }
     </style>
     """, unsafe_allow_html=True)
+
+# Logo and Title
+st.markdown('<h1 class="logo-text">LungScan-AI</h1>', unsafe_allow_html=True)
+st.markdown('<p class="logo-subtext">Advanced Lung Cancer Detection Using Artificial Intelligence</p>', unsafe_allow_html=True)
+
+def download_model():
+    """Download the model file if it doesn't exist"""
+    model_path = 'models/lung_cancer_detector.pth'
+    if not os.path.exists(model_path):
+        os.makedirs('models', exist_ok=True)
+        # You need to replace this URL with your actual model file URL
+        url = st.secrets.get("MODEL_URL", "")
+        if not url:
+            st.error("Model URL not configured. Please contact administrator.")
+            st.stop()
+        
+        try:
+            response = requests.get(url, timeout=30)
+            response.raise_for_status()
+            with open(model_path, 'wb') as f:
+                f.write(response.content)
+            st.success("Model downloaded successfully!")
+        except Exception as e:
+            st.error(f"Error downloading model: {str(e)}")
+            st.stop()
 
 @st.cache_resource
 def load_model():
     """Load the trained model"""
+    # Ensure model file exists
+    download_model()
+    
     model = models.resnet18(pretrained=False)
     num_ftrs = model.fc.in_features
     model.fc = nn.Linear(num_ftrs, config.NUM_CLASSES)
