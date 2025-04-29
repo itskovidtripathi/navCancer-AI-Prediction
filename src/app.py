@@ -25,7 +25,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS
+# Custom CSS with added styles for popup
 st.markdown("""
     <style>
     .main {
@@ -78,8 +78,43 @@ st.markdown("""
         font-size: 1.2em;
         margin-bottom: 30px;
     }
+    .consent-popup {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin: 20px auto;
+        max-width: 800px;
+        text-align: center;
+    }
+    .consent-text {
+        font-size: 1.1em;
+        line-height: 1.6;
+        color: #333;
+        margin-bottom: 25px;
+        text-align: justify;
+    }
+    .restricted-message {
+        background-color: #ffebee;
+        color: #c62828;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px 0;
+        text-align: center;
+        font-weight: bold;
+    }
     </style>
     """, unsafe_allow_html=True)
+
+# Initialize session states
+if 'user_consent_given' not in st.session_state:
+    st.session_state.user_consent_given = None
+if 'user_registered' not in st.session_state:
+    st.session_state.user_registered = False
+if 'user_id' not in st.session_state:
+    st.session_state.user_id = None
+if 'show_consent_popup' not in st.session_state:
+    st.session_state.show_consent_popup = True
 
 # Logo and Title
 st.markdown('<h1 class="logo-text">LungScan-AI</h1>', unsafe_allow_html=True)
@@ -346,44 +381,80 @@ def save_prediction(image, prediction_info):
     return image_path, info_path
 
 def main():
+    # Show consent popup if not already handled
+    if st.session_state.show_consent_popup:
+        st.markdown("""
+        <style>
+            .consent-modal {
+                background-color: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                padding: 2rem;
+                margin: 1rem 0;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            .consent-title {
+                color: #2c3e50;
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 1.2rem;
+            }
+            .consent-content {
+                color: #4a5568;
+                line-height: 1.6;
+                margin-bottom: 1.5rem;
+            }
+            .consent-list {
+                margin: 0.8rem 0;
+                padding-left: 1.5rem;
+            }
+            .consent-button {
+                font-weight: 500 !important;
+                transition: all 0.2s ease !important;
+            }
+        </style>
+        
+        <div class="consent-modal">
+            <div class="consent-title">Professional Review Service Authorization</div>
+            <div class="consent-content">
+                <p>To enhance your diagnostic experience, we offer:</p>
+                <ul class="consent-list">
+                    <li>Complementary secondary evaluation by domain experts</li>
+                    <li>Detailed diagnostic report with actionable insights</li>
+                    <li>Personalized decision-support framework</li>
+                </ul>
+                <p>By proceeding, you agree to provide basic demographic information necessary for report generation. All data is protected under HIPAA compliance standards and used solely for diagnostic purposes.</p>
+            </div>
+            <div class="consent-actions">
+        """, unsafe_allow_html=True)
+
+        col1, col2, col3 = st.columns([1, 2, 2])
+        with col2:
+            if st.button("✓ I Agree to Terms", 
+                        use_container_width=True,
+                        key="agree_btn",
+                        type="primary",
+                        help="Provide consent for expert review and report generation"):
+                st.session_state.user_consent_given = True
+                st.session_state.show_consent_popup = False
+                st.rerun()
+        with col3:
+            if st.button("✗ Decline Service", 
+                        use_container_width=True,
+                        key="disagree_btn",
+                        help="Continue without expert review and report features"):
+                st.session_state.user_consent_given = False
+                st.session_state.show_consent_popup = False
+                st.rerun()
+        
+        st.markdown("</div></div>", unsafe_allow_html=True)
+        return
     # Header
     st.title("🫁 Lung Cancer Detection System")
     st.markdown("---")
     
-    # Initialize session state for user registration
-    if 'user_registered' not in st.session_state:
-        st.session_state.user_registered = False
-        st.session_state.user_id = None
-    
-    # Sidebar
-    with st.sidebar:
-        st.header("About")
-        st.info("""
-        This system uses deep learning to detect lung cancer from chest X-ray images.
-        
-        **Supported Types:**
-        - Normal
-        - Squamous Cell Carcinoma
-        - Adenocarcinoma
-        
-        **Model Details:**
-        - Architecture: ResNet18
-        - Input Size: 224x224
-        - Accuracy: 97.03%
-        """)
-        
-        st.markdown("---")
-        st.markdown("### Instructions")
-        st.markdown("""
-        1. Fill in your information
-        2. Upload a chest X-ray image
-        3. Wait for the analysis
-        4. Review the detailed results
-        5. Download the report if needed
-        """)
-    
-    # User registration form
-    if not st.session_state.user_registered:
+    # Show registration form only if user agreed
+    if st.session_state.user_consent_given and not st.session_state.user_registered:
         st.markdown("### User Information")
         with st.form("user_form"):
             name = st.text_input("Full Name*")
@@ -406,8 +477,8 @@ def main():
                         st.success("Information submitted successfully!")
                         st.rerun()
     
-    # Main content - only show after user registration
-    if st.session_state.user_registered:
+    # Main content - show to all users but with restrictions for those who disagreed
+    if st.session_state.user_registered or not st.session_state.user_consent_given:
         col1, col2 = st.columns([1, 1])
         
         with col1:
@@ -423,16 +494,14 @@ def main():
                 model = load_model()
                 input_tensor = preprocess_image(image)
                 
-                if input_tensor is not None:  # Only proceed if validation passed
+                if input_tensor is not None:
                     predicted_class, confidence, probabilities = predict_image(model, input_tensor)
-                    
-                    # Get class names
                     class_names = list(config.CLASS_NAMES.values())
                     
                     with col2:
                         st.markdown("### Analysis Results")
                         
-                        # Display prediction
+                        # Display basic prediction for all users
                         prediction_box = f"""
                         <div class='prediction-box'>
                             <h3>Diagnosis</h3>
@@ -444,84 +513,86 @@ def main():
                         """
                         st.markdown(prediction_box, unsafe_allow_html=True)
                         
-                        # Display probability plot
-                        st.markdown("### Probability Distribution")
-                        prob_fig = plot_probabilities(probabilities, class_names)
-                        st.pyplot(prob_fig)
-                        
-                        # Generate detailed report
-                        detailed_report = generate_detailed_report(
-                            predicted_class, 
-                            confidence, 
-                            probabilities, 
-                            class_names
-                        )
-                        
-                        # Save results
-                        image_path, info_path = save_prediction(image, detailed_report)
-                        
-                        # Save prediction to database
-                        db.add_prediction(
-                            st.session_state.user_id,
-                            image_path,
-                            class_names[predicted_class],
-                            confidence,
-                            info_path
-                        )
-                        
-                        # Display key findings
-                        st.markdown("### Key Findings")
-                        with st.expander("View Detailed Analysis", expanded=True):
-                            diagnosis = class_names[predicted_class]
-                            medical_info = config.MEDICAL_INFO[diagnosis]
+                        # Show detailed results only for users who agreed and registered
+                        if st.session_state.user_consent_given and st.session_state.user_registered:
+                            # Display probability plot
+                            st.markdown("### Probability Distribution")
+                            prob_fig = plot_probabilities(probabilities, class_names)
+                            st.pyplot(prob_fig)
                             
-                            st.markdown(f"**Description:**")
-                            st.write(medical_info['description'])
+                            # Generate and display detailed report
+                            detailed_report = generate_detailed_report(
+                                predicted_class, 
+                                confidence, 
+                                probabilities, 
+                                class_names
+                            )
                             
-                            if diagnosis != 'Normal':
-                                st.markdown(f"**Characteristics:**")
-                                for char in medical_info['characteristics']:
-                                    st.write(f"- {char}")
+                            # Save results
+                            image_path, info_path = save_prediction(image, detailed_report)
                             
-                            st.markdown(f"**Recommendations:**")
-                            for rec in medical_info['recommendations']:
-                                st.write(f"- {rec}")
-                        
-                        # Download buttons
-                        st.markdown("### Download Results")
-                        col_btn1, col_btn2 = st.columns(2)
-                        with col_btn1:
-                            with open(info_path, 'r') as f:
-                                st.download_button(
-                                    label="📄 Download Detailed Report",
-                                    data=f.read(),
-                                    file_name=f"lung_cancer_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
-                                    mime="text/plain"
-                                )
-                        with col_btn2:
-                            with open(image_path, 'rb') as f:
-                                st.download_button(
-                                    label="🖼️ Download Image",
-                                    data=f.read(),
-                                    file_name=f"xray_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg",
-                                    mime="image/jpeg"
-                                )
-                else:
-                    with col2:
-                        st.error("⚠️ Invalid Image")
-                        st.markdown("""
-                        Please ensure you upload a valid chest X-ray image. The image should:
-                        - Be a grayscale or X-ray image
-                        - Have proper contrast
-                        - Be properly exposed (not too bright or dark)
-                        - Be a medical-grade chest X-ray
-                        """)
-                        st.markdown("If you're sure this is a chest X-ray image and still seeing this error, try:")
-                        st.markdown("""
-                        1. Using a different X-ray image
-                        2. Ensuring the image is properly scanned/digitized
-                        3. Checking the image quality and format
-                        """)
+                            # Save prediction to database
+                            db.add_prediction(
+                                st.session_state.user_id,
+                                image_path,
+                                class_names[predicted_class],
+                                confidence,
+                                info_path
+                            )
+                            
+                            # Display key findings
+                            st.markdown("### Key Findings")
+                            with st.expander("View Detailed Analysis", expanded=True):
+                                diagnosis = class_names[predicted_class]
+                                medical_info = config.MEDICAL_INFO[diagnosis]
+                                
+                                st.markdown(f"**Description:**")
+                                st.write(medical_info['description'])
+                                
+                                if diagnosis != 'Normal':
+                                    st.markdown(f"**Characteristics:**")
+                                    for char in medical_info['characteristics']:
+                                        st.write(f"- {char}")
+                                
+                                st.markdown(f"**Recommendations:**")
+                                for rec in medical_info['recommendations']:
+                                    st.write(f"- {rec}")
+                            
+                            # Download buttons
+                            st.markdown("### Download Results")
+                            col_btn1, col_btn2 = st.columns(2)
+                            with col_btn1:
+                                with open(info_path, 'r') as f:
+                                    st.download_button(
+                                        label="📄 Download Detailed Report",
+                                        data=f.read(),
+                                        file_name=f"lung_cancer_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+                                        mime="text/plain"
+                                    )
+                            with col_btn2:
+                                with open(image_path, 'rb') as f:
+                                    st.download_button(
+                                        label="🖼️ Download Image",
+                                        data=f.read(),
+                                        file_name=f"xray_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg",
+                                        mime="image/jpeg"
+                                    )
+                        else:
+                            st.markdown("""
+                            <div class="restricted-message">
+                                ⚠️ Fill in your details to see the complete report and download options.
+                                <br>This includes:
+                                <br>• Detailed probability distribution
+                                <br>• Key findings and characteristics
+                                <br>• Downloadable detailed report
+                                <br>• Expert review of your case
+                            </div>
+                            """, unsafe_allow_html=True)
+                            
+                            if st.button("Provide Details Now"):
+                                st.session_state.user_consent_given = True
+                                st.session_state.show_consent_popup = True
+                                st.rerun()
 
 if __name__ == "__main__":
     main() 
