@@ -13,6 +13,7 @@ import config
 from database import Database
 import re
 import requests
+from scipy import ndimage
 
 # Initialize database
 db = Database()
@@ -120,8 +121,83 @@ def load_model():
     model.eval()
     return model
 
+def is_valid_xray(image):
+    """
+    Validate if the uploaded image appears to be a chest X-ray
+    Returns: (bool, str) - (is_valid, message)
+    """
+    try:
+        # Convert to grayscale and get pixel values
+        gray_img = image.convert('L')
+        pixel_values = np.array(gray_img)
+        
+        # Check image characteristics typical of X-rays
+        mean_intensity = np.mean(pixel_values)
+        std_intensity = np.std(pixel_values)
+        
+        # Calculate histogram features
+        hist, _ = np.histogram(pixel_values, bins=256, range=(0, 256))
+        hist = hist / hist.sum()  # Normalize histogram
+        
+        # X-ray specific checks:
+        
+        # 1. Check for bimodal distribution (typical in X-rays)
+        peaks = []
+        for i in range(1, 255):
+            if hist[i-1] < hist[i] and hist[i] > hist[i+1]:
+                peaks.append(i)
+        if len(peaks) < 2:
+            return False, "Image does not show typical X-ray intensity distribution."
+            
+        # 2. Check contrast and dynamic range
+        if std_intensity < 45:  # Increased threshold for contrast
+            return False, "Image has insufficient contrast for an X-ray."
+            
+        # 3. Check intensity range (X-rays have specific brightness characteristics)
+        if mean_intensity < 100 or mean_intensity > 200:
+            return False, "Image brightness is not in the typical range for X-rays."
+            
+        # 4. Check for color variation (X-rays are fundamentally grayscale)
+        rgb_image = image.convert('RGB')
+        r, g, b = rgb_image.split()
+        r_arr = np.array(r)
+        g_arr = np.array(g)
+        b_arr = np.array(b)
+        
+        # Calculate color channel correlations
+        rg_corr = np.corrcoef(r_arr.flat, g_arr.flat)[0,1]
+        rb_corr = np.corrcoef(r_arr.flat, b_arr.flat)[0,1]
+        gb_corr = np.corrcoef(g_arr.flat, b_arr.flat)[0,1]
+        
+        # X-rays should have very high correlation between channels (almost identical)
+        if not (rg_corr > 0.98 and rb_corr > 0.98 and gb_corr > 0.98):
+            return False, "Image contains significant color variation, which is not typical for X-rays."
+            
+        # 5. Check for typical X-ray edge characteristics
+        edges = ndimage.sobel(pixel_values)
+        edge_intensity = np.mean(np.abs(edges))
+        if edge_intensity < 10:  # Threshold for edge detection
+            return False, "Image lacks the characteristic edge patterns of chest X-rays."
+            
+        # 6. Check image size (X-rays typically have specific dimensions)
+        width, height = image.size
+        aspect_ratio = width / height
+        if not (0.7 <= aspect_ratio <= 1.5):  # Typical chest X-ray aspect ratios
+            return False, "Image dimensions are not typical for chest X-rays."
+            
+        return True, "Valid X-ray image"
+        
+    except Exception as e:
+        return False, f"Error validating image: {str(e)}"
+
 def preprocess_image(image):
     """Preprocess the image for model input"""
+    # First validate if it's an X-ray image
+    is_valid, message = is_valid_xray(image)
+    if not is_valid:
+        st.error(message)
+        return None
+        
     transform = transforms.Compose([
         transforms.Resize((config.INPUT_SIZE, config.INPUT_SIZE)),
         transforms.ToTensor(),
@@ -134,6 +210,9 @@ def preprocess_image(image):
 
 def predict_image(model, input_tensor):
     """Make prediction for a single image"""
+    if input_tensor is None:
+        return None, None, None
+        
     with torch.no_grad():
         output = model(input_tensor.to(config.DEVICE))
         probabilities = torch.nn.functional.softmax(output[0], dim=0)
@@ -338,93 +417,111 @@ def main():
             if uploaded_file is not None:
                 # Display uploaded image
                 image = Image.open(uploaded_file).convert('RGB')
-                st.image(image, caption="Uploaded X-ray Image", use_column_width=True)
+                st.image(image, caption="Uploaded Image", use_column_width=True)
                 
-                # Make prediction
+                # Validate and make prediction
                 model = load_model()
                 input_tensor = preprocess_image(image)
-                predicted_class, confidence, probabilities = predict_image(model, input_tensor)
                 
-                # Get class names
-                class_names = list(config.CLASS_NAMES.values())
-                
-                with col2:
-                    st.markdown("### Analysis Results")
+                if input_tensor is not None:  # Only proceed if validation passed
+                    predicted_class, confidence, probabilities = predict_image(model, input_tensor)
                     
-                    # Display prediction
-                    prediction_box = f"""
-                    <div class='prediction-box'>
-                        <h3>Diagnosis</h3>
-                        <p style='font-size: 24px; color: {'red' if predicted_class != 0 else 'green'};'>
-                            {class_names[predicted_class]}
-                        </p>
-                        <p style='font-size: 18px;'>Confidence: {confidence:.1%}</p>
-                    </div>
-                    """
-                    st.markdown(prediction_box, unsafe_allow_html=True)
+                    # Get class names
+                    class_names = list(config.CLASS_NAMES.values())
                     
-                    # Display probability plot
-                    st.markdown("### Probability Distribution")
-                    prob_fig = plot_probabilities(probabilities, class_names)
-                    st.pyplot(prob_fig)
-                    
-                    # Generate detailed report
-                    detailed_report = generate_detailed_report(
-                        predicted_class, 
-                        confidence, 
-                        probabilities, 
-                        class_names
-                    )
-                    
-                    # Save results
-                    image_path, info_path = save_prediction(image, detailed_report)
-                    
-                    # Save prediction to database
-                    db.add_prediction(
-                        st.session_state.user_id,
-                        image_path,
-                        class_names[predicted_class],
-                        confidence,
-                        info_path
-                    )
-                    
-                    # Display key findings
-                    st.markdown("### Key Findings")
-                    with st.expander("View Detailed Analysis", expanded=True):
-                        diagnosis = class_names[predicted_class]
-                        medical_info = config.MEDICAL_INFO[diagnosis]
+                    with col2:
+                        st.markdown("### Analysis Results")
                         
-                        st.markdown(f"**Description:**")
-                        st.write(medical_info['description'])
+                        # Display prediction
+                        prediction_box = f"""
+                        <div class='prediction-box'>
+                            <h3>Diagnosis</h3>
+                            <p style='font-size: 24px; color: {'red' if predicted_class != 0 else 'green'};'>
+                                {class_names[predicted_class]}
+                            </p>
+                            <p style='font-size: 18px;'>Confidence: {confidence:.1%}</p>
+                        </div>
+                        """
+                        st.markdown(prediction_box, unsafe_allow_html=True)
                         
-                        if diagnosis != 'Normal':
-                            st.markdown(f"**Characteristics:**")
-                            for char in medical_info['characteristics']:
-                                st.write(f"- {char}")
+                        # Display probability plot
+                        st.markdown("### Probability Distribution")
+                        prob_fig = plot_probabilities(probabilities, class_names)
+                        st.pyplot(prob_fig)
                         
-                        st.markdown(f"**Recommendations:**")
-                        for rec in medical_info['recommendations']:
-                            st.write(f"- {rec}")
-                    
-                    # Download buttons
-                    st.markdown("### Download Results")
-                    col_btn1, col_btn2 = st.columns(2)
-                    with col_btn1:
-                        with open(info_path, 'r') as f:
-                            st.download_button(
-                                label="📄 Download Detailed Report",
-                                data=f.read(),
-                                file_name=f"lung_cancer_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
-                                mime="text/plain"
-                            )
-                    with col_btn2:
-                        with open(image_path, 'rb') as f:
-                            st.download_button(
-                                label="🖼️ Download Image",
-                                data=f.read(),
-                                file_name=f"xray_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg",
-                                mime="image/jpeg"
-                            )
+                        # Generate detailed report
+                        detailed_report = generate_detailed_report(
+                            predicted_class, 
+                            confidence, 
+                            probabilities, 
+                            class_names
+                        )
+                        
+                        # Save results
+                        image_path, info_path = save_prediction(image, detailed_report)
+                        
+                        # Save prediction to database
+                        db.add_prediction(
+                            st.session_state.user_id,
+                            image_path,
+                            class_names[predicted_class],
+                            confidence,
+                            info_path
+                        )
+                        
+                        # Display key findings
+                        st.markdown("### Key Findings")
+                        with st.expander("View Detailed Analysis", expanded=True):
+                            diagnosis = class_names[predicted_class]
+                            medical_info = config.MEDICAL_INFO[diagnosis]
+                            
+                            st.markdown(f"**Description:**")
+                            st.write(medical_info['description'])
+                            
+                            if diagnosis != 'Normal':
+                                st.markdown(f"**Characteristics:**")
+                                for char in medical_info['characteristics']:
+                                    st.write(f"- {char}")
+                            
+                            st.markdown(f"**Recommendations:**")
+                            for rec in medical_info['recommendations']:
+                                st.write(f"- {rec}")
+                        
+                        # Download buttons
+                        st.markdown("### Download Results")
+                        col_btn1, col_btn2 = st.columns(2)
+                        with col_btn1:
+                            with open(info_path, 'r') as f:
+                                st.download_button(
+                                    label="📄 Download Detailed Report",
+                                    data=f.read(),
+                                    file_name=f"lung_cancer_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt",
+                                    mime="text/plain"
+                                )
+                        with col_btn2:
+                            with open(image_path, 'rb') as f:
+                                st.download_button(
+                                    label="🖼️ Download Image",
+                                    data=f.read(),
+                                    file_name=f"xray_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg",
+                                    mime="image/jpeg"
+                                )
+                else:
+                    with col2:
+                        st.error("⚠️ Invalid Image")
+                        st.markdown("""
+                        Please ensure you upload a valid chest X-ray image. The image should:
+                        - Be a grayscale or X-ray image
+                        - Have proper contrast
+                        - Be properly exposed (not too bright or dark)
+                        - Be a medical-grade chest X-ray
+                        """)
+                        st.markdown("If you're sure this is a chest X-ray image and still seeing this error, try:")
+                        st.markdown("""
+                        1. Using a different X-ray image
+                        2. Ensuring the image is properly scanned/digitized
+                        3. Checking the image quality and format
+                        """)
 
 if __name__ == "__main__":
     main() 
