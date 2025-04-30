@@ -146,3 +146,106 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 Copyright 2024 LungScan-AI
 
  
+<!-- UML diagram -->
+
+@startuml LungScan-AI
+
+' Style configurations
+skinparam class {
+    BackgroundColor LightBlue
+    ArrowColor Black
+    BorderColor DarkBlue
+}
+
+' Database Class
+class Database {
+    - db_file: str
+    + __init__()
+    + initialize_database()
+    - _hash_password(password: str)
+    + verify_admin(username: str, password: str): bool
+    + add_user(name: str, email: str, phone: str, address: str): int
+    + add_prediction(user_id: int, image_path: str, prediction: str, confidence: float, report_path: str)
+    + get_all_predictions(): list
+    + get_user_predictions(email: str): list
+}
+
+' Configuration
+class Config {
+    + INPUT_SIZE: int
+    + BATCH_SIZE: int
+    + NUM_CLASSES: int
+    + LEARNING_RATE: float
+    + NUM_EPOCHS: int
+    + DEVICE: str
+    + MEAN: list
+    + STD: list
+    + CLASS_NAMES: dict
+    + MEDICAL_INFO: dict
+}
+
+' Main Application
+class App {
+    + load_model()
+    + preprocess_image(image: Image)
+    + is_valid_xray(image: Image): tuple
+    + predict_image(model, input_tensor): tuple
+    + plot_probabilities(probabilities, class_names)
+    + generate_detailed_report(predicted_class, confidence, probabilities, class_names): str
+}
+
+' Admin Panel
+class AdminPanel {
+    + admin_login()
+    + view_predictions()
+    + admin_panel()
+}
+
+' Data Preprocessing
+class DataPreprocessing {
+    + preprocess_dataset(data_dir: str)
+    + augment_data(image: Image)
+    + create_dataloaders(): tuple
+}
+
+' Training
+class Training {
+    + train_model(model, train_loader, val_loader, criterion, optimizer)
+    + save_model(model, path: str)
+    + load_model(path: str)
+}
+
+' Evaluation
+class Evaluation {
+    + evaluate_model(model, test_loader)
+    + calculate_metrics(predictions, targets)
+    + plot_confusion_matrix(predictions, targets)
+    + generate_report(predictions, targets)
+}
+
+' Relationships
+Database "1" -- "1" AdminPanel : uses
+App "1" -- "1" Database : uses
+App "1" -- "1" Config : uses
+Training "1" -- "1" Config : uses
+Training "1" -- "1" DataPreprocessing : uses
+Evaluation "1" -- "1" Training : uses
+AdminPanel "1" -- "1" Config : uses
+
+' Dependencies
+note right of App
+  Depends on:
+  - Streamlit
+  - PyTorch
+  - PIL
+  - Matplotlib
+end note
+
+note right of Database
+  Depends on:
+  - SQLite3
+  - hashlib
+  - dotenv
+end note
+
+@enduml

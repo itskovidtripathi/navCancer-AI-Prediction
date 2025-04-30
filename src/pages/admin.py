@@ -101,7 +101,8 @@ def view_predictions():
                             label="📄 Download Report",
                             data=report_content,
                             file_name=f"report_{row['Name']}_{datetime.now().strftime('%Y%m%d')}.txt",
-                            mime="text/plain"
+                            mime="text/plain",
+                            key=f"download_button_{index}_{row['Date'].replace(' ', '_')}"
                         )
 
 def admin_panel():
