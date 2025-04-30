@@ -579,9 +579,10 @@ def main():
                                     )
                         else:
                             st.markdown("""
-                            <div class="restricted-message">
+                            <div class="restricted-message" style="text-align: left;">
                                 ⚠️ Fill in your details to see the complete report and download options.
-                                <br>This includes:
+                                <br>This includes :
+                                <br>
                                 <br>• Detailed probability distribution
                                 <br>• Key findings and characteristics
                                 <br>• Downloadable detailed report
