@@ -13,6 +13,7 @@ import config
 from database import Database
 import re
 import requests
+from scipy import ndimage
 
 # Initialize database
 db = Database()
@@ -24,7 +25,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS
+# Custom CSS with added styles for popup
 st.markdown("""
     <style>
     .main {
@@ -77,8 +78,43 @@ st.markdown("""
         font-size: 1.2em;
         margin-bottom: 30px;
     }
+    .consent-popup {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin: 20px auto;
+        max-width: 800px;
+        text-align: center;
+    }
+    .consent-text {
+        font-size: 1.1em;
+        line-height: 1.6;
+        color: #333;
+        margin-bottom: 25px;
+        text-align: justify;
+    }
+    .restricted-message {
+        background-color: #ffebee;
+        color: #c62828;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px 0;
+        text-align: center;
+        font-weight: bold;
+    }
     </style>
     """, unsafe_allow_html=True)
+
+# Initialize session states
+if 'user_consent_given' not in st.session_state:
+    st.session_state.user_consent_given = None
+if 'user_registered' not in st.session_state:
+    st.session_state.user_registered = False
+if 'user_id' not in st.session_state:
+    st.session_state.user_id = None
+if 'show_consent_popup' not in st.session_state:
+    st.session_state.show_consent_popup = True
 
 # Logo and Title
 st.markdown('<h1 class="logo-text">LungScan-AI</h1>', unsafe_allow_html=True)
@@ -120,8 +156,83 @@ def load_model():
     model.eval()
     return model
 
+def is_valid_xray(image):
+    """
+    Validate if the uploaded image appears to be a chest X-ray
+    Returns: (bool, str) - (is_valid, message)
+    """
+    try:
+        # Convert to grayscale and get pixel values
+        gray_img = image.convert('L')
+        pixel_values = np.array(gray_img)
+        
+        # Check image characteristics typical of X-rays
+        mean_intensity = np.mean(pixel_values)
+        std_intensity = np.std(pixel_values)
+        
+        # Calculate histogram features
+        hist, _ = np.histogram(pixel_values, bins=256, range=(0, 256))
+        hist = hist / hist.sum()  # Normalize histogram
+        
+        # X-ray specific checks:
+        
+        # 1. Check for bimodal distribution (typical in X-rays)
+        peaks = []
+        for i in range(1, 255):
+            if hist[i-1] < hist[i] and hist[i] > hist[i+1]:
+                peaks.append(i)
+        if len(peaks) < 2:
+            return False, "Image does not show typical X-ray intensity distribution."
+            
+        # 2. Check contrast and dynamic range
+        if std_intensity < 45:  # Increased threshold for contrast
+            return False, "Image has insufficient contrast for an X-ray."
+            
+        # 3. Check intensity range (X-rays have specific brightness characteristics)
+        if mean_intensity < 100 or mean_intensity > 200:
+            return False, "Image brightness is not in the typical range for X-rays."
+            
+        # 4. Check for color variation (X-rays are fundamentally grayscale)
+        rgb_image = image.convert('RGB')
+        r, g, b = rgb_image.split()
+        r_arr = np.array(r)
+        g_arr = np.array(g)
+        b_arr = np.array(b)
+        
+        # Calculate color channel correlations
+        rg_corr = np.corrcoef(r_arr.flat, g_arr.flat)[0,1]
+        rb_corr = np.corrcoef(r_arr.flat, b_arr.flat)[0,1]
+        gb_corr = np.corrcoef(g_arr.flat, b_arr.flat)[0,1]
+        
+        # X-rays should have very high correlation between channels (almost identical)
+        if not (rg_corr > 0.98 and rb_corr > 0.98 and gb_corr > 0.98):
+            return False, "Image contains significant color variation, which is not typical for X-rays."
+            
+        # 5. Check for typical X-ray edge characteristics
+        edges = ndimage.sobel(pixel_values)
+        edge_intensity = np.mean(np.abs(edges))
+        if edge_intensity < 10:  # Threshold for edge detection
+            return False, "Image lacks the characteristic edge patterns of chest X-rays."
+            
+        # 6. Check image size (X-rays typically have specific dimensions)
+        width, height = image.size
+        aspect_ratio = width / height
+        if not (0.7 <= aspect_ratio <= 1.5):  # Typical chest X-ray aspect ratios
+            return False, "Image dimensions are not typical for chest X-rays."
+            
+        return True, "Valid X-ray image"
+        
+    except Exception as e:
+        return False, f"Error validating image: {str(e)}"
+
 def preprocess_image(image):
     """Preprocess the image for model input"""
+    # First validate if it's an X-ray image
+    is_valid, message = is_valid_xray(image)
+    if not is_valid:
+        st.error(message)
+        return None
+        
     transform = transforms.Compose([
         transforms.Resize((config.INPUT_SIZE, config.INPUT_SIZE)),
         transforms.ToTensor(),
@@ -134,6 +245,9 @@ def preprocess_image(image):
 
 def predict_image(model, input_tensor):
     """Make prediction for a single image"""
+    if input_tensor is None:
+        return None, None, None
+        
     with torch.no_grad():
         output = model(input_tensor.to(config.DEVICE))
         probabilities = torch.nn.functional.softmax(output[0], dim=0)
@@ -271,44 +385,80 @@ def save_prediction(image, prediction_info):
     return image_path, info_path
 
 def main():
+    # Show consent popup if not already handled
+    if st.session_state.show_consent_popup:
+        st.markdown("""
+        <style>
+            .consent-modal {
+                background-color: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                padding: 2rem;
+                margin: 1rem 0;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            .consent-title {
+                color: #2c3e50;
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 1.2rem;
+            }
+            .consent-content {
+                color: #4a5568;
+                line-height: 1.6;
+                margin-bottom: 1.5rem;
+            }
+            .consent-list {
+                margin: 0.8rem 0;
+                padding-left: 1.5rem;
+            }
+            .consent-button {
+                font-weight: 500 !important;
+                transition: all 0.2s ease !important;
+            }
+        </style>
+        
+        <div class="consent-modal">
+            <div class="consent-title">Professional Review Service Authorization</div>
+            <div class="consent-content">
+                <p>To enhance your diagnostic experience, we offer:</p>
+                <ul class="consent-list">
+                    <li>Complementary secondary evaluation by domain experts</li>
+                    <li>Detailed diagnostic report with actionable insights</li>
+                    <li>Personalized decision-support framework</li>
+                </ul>
+                <p>By proceeding, you agree to provide basic demographic information necessary for report generation. All data is protected under HIPAA compliance standards and used solely for diagnostic purposes.</p>
+            </div>
+            <div class="consent-actions">
+        """, unsafe_allow_html=True)
+
+        col1, col2, col3 = st.columns([1, 2, 2])
+        with col2:
+            if st.button("✓ I Agree to Terms", 
+                        use_container_width=True,
+                        key="agree_btn",
+                        type="primary",
+                        help="Provide consent for expert review and report generation"):
+                st.session_state.user_consent_given = True
+                st.session_state.show_consent_popup = False
+                st.rerun()
+        with col3:
+            if st.button("✗ Decline Service", 
+                        use_container_width=True,
+                        key="disagree_btn",
+                        help="Continue without expert review and report features"):
+                st.session_state.user_consent_given = False
+                st.session_state.show_consent_popup = False
+                st.rerun()
+        
+        st.markdown("</div></div>", unsafe_allow_html=True)
+        return
     # Header
     st.title("🫁 Lung Cancer Detection System")
     st.markdown("---")
     
-    # Initialize session state for user registration
-    if 'user_registered' not in st.session_state:
-        st.session_state.user_registered = False
-        st.session_state.user_id = None
-    
-    # Sidebar
-    with st.sidebar:
-        st.header("About")
-        st.info("""
-        This system uses deep learning to detect lung cancer from chest X-ray images.
-        
-        **Supported Types:**
-        - Normal
-        - Squamous Cell Carcinoma
-        - Adenocarcinoma
-        
-        **Model Details:**
-        - Architecture: ResNet18
-        - Input Size: 224x224
-        - Accuracy: 97.03%
-        """)
-        
-        st.markdown("---")
-        st.markdown("### Instructions")
-        st.markdown("""
-        1. Fill in your information
-        2. Upload a chest X-ray image
-        3. Wait for the analysis
-        4. Review the detailed results
-        5. Download the report if needed
-        """)
-    
-    # User registration form
-    if not st.session_state.user_registered:
+    # Show registration form only if user agreed
+    if st.session_state.user_consent_given and not st.session_state.user_registered:
         st.markdown("### User Information")
         with st.form("user_form"):
             name = st.text_input("Full Name*")
@@ -331,8 +481,8 @@ def main():
                         st.success("Information submitted successfully!")
                         st.rerun()
     
-    # Main content - only show after user registration
-    if st.session_state.user_registered:
+    # Main content - show to all users but with restrictions for those who disagreed
+    if st.session_state.user_registered or not st.session_state.user_consent_given:
         col1, col2 = st.columns([1, 1])
         
         with col1:
@@ -342,18 +492,15 @@ def main():
             if uploaded_file is not None:
                 # Display uploaded image
                 image = Image.open(uploaded_file).convert('RGB')
-                st.image(image, caption="Uploaded X-ray Image", use_column_width=True)
+                st.image(image, caption="Uploaded Image", use_column_width=True)
                 
-                # Make prediction
+                # Validate and make prediction
                 model = load_model()
                 input_tensor = preprocess_image(image)
-                predicted_class, confidence, probabilities = predict_image(model, input_tensor)
                 
-                # Get class names
-                class_names = list(config.CLASS_NAMES.values())
-                
-                with col2:
-                    st.markdown("### Analysis Results")
+                if input_tensor is not None:
+                    predicted_class, confidence, probabilities = predict_image(model, input_tensor)
+                    class_names = list(config.CLASS_NAMES.values())
                     
                     # Display prediction
                     prediction_box = f"""
@@ -432,6 +579,23 @@ def main():
                                 file_name=f"xray_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg",
                                 mime="image/jpeg"
                             )
+                else:
+                    st.markdown("""
+                    <div class="restricted-message" style="text-align: left;">
+                        ⚠️ Fill in your details to see the complete report and download options.
+                        <br>This includes :
+                        <br>
+                        <br>• Detailed probability distribution
+                        <br>• Key findings and characteristics
+                        <br>• Downloadable detailed report
+                        <br>• Expert review of your case
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    if st.button("Provide Details Now"):
+                        st.session_state.user_consent_given = True
+                        st.session_state.show_consent_popup = True
+                        st.rerun()
 
 if __name__ == "__main__":
     main() 
