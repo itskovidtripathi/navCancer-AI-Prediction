@@ -173,6 +173,10 @@ def generate_detailed_report(predicted_class, confidence, probabilities, class_n
     report = f"""
 LUNG CANCER DETECTION REPORT
 {'=' * 50}
+
+[WARNING] DISCLAIMER: This is an AI generated prediction. Please consult a specialist before taking any step further.
+{'=' * 50}
+
 Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 DIAGNOSIS
@@ -362,6 +366,9 @@ def main():
                     </div>
                     """
                     st.markdown(prediction_box, unsafe_allow_html=True)
+                    
+                    # Display disclaimer
+                    st.warning("⚠️ This is an AI generated prediction. Please consult a specialist before taking any step further.")
                     
                     # Display probability plot
                     st.markdown("### Probability Distribution")
