@@ -153,5 +153,3 @@ Copyright 2024 LungScan-AI
 
 <<<<<<< HEAD
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) 
-=======
->>>>>>> 918c80bd0aefea68d6abc62fcd6fbd1882fb4bbb
