@@ -32,31 +32,35 @@ st.markdown("""
         padding: 0rem 0rem;
     }
     .stApp {
-        background-color: #f5f5f5;
+        background-color: #0036fa;
+    }
+    [data-testid="stSidebar"] {
+        background-color: #ffd166;
     }
     .upload-box {
-        border: 2px dashed #1f77b4;
+        border: 2px dashed #ffd166;
         padding: 20px;
         border-radius: 10px;
         text-align: center;
         margin: 20px 0;
     }
     .prediction-box {
-        background-color: white;
+        background-color: #ffd500;
         padding: 20px;
         border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-color: #a4133c;
+        box-shadow: 4px 2px 4px rgba(0,3,4,0.7);
         margin: 20px 0;
     }
     .metric-box {
-        background-color: white;
+        background-color: #ffd500;
         padding: 15px;
         border-radius: 8px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         margin: 10px 0;
     }
     .user-form {
-        background-color: white;
+        background-color: #ffd500;
         padding: 20px;
         border-radius: 10px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -74,12 +78,12 @@ st.markdown("""
     }
     .logo-subtext {
         text-align: center;
-        color: #666;
-        font-size: 1.2em;
+        color: #720026;
+        font-size: 4em;
         margin-bottom: 30px;
     }
     .consent-popup {
-        background-color: white;
+        background-color: #ffbd00; #dark green
         padding: 30px;
         border-radius: 10px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -90,13 +94,13 @@ st.markdown("""
     .consent-text {
         font-size: 1.1em;
         line-height: 1.6;
-        color: #333;
+        color: #ffd500;
         margin-bottom: 25px;
         text-align: justify;
     }
     .restricted-message {
-        background-color: #ffebee;
-        color: #c62828;
+        background-color: #ffd500;
+        color: #ffd500;
         padding: 15px;
         border-radius: 5px;
         margin: 10px 0;
@@ -118,7 +122,7 @@ if 'show_consent_popup' not in st.session_state:
 
 # Logo and Title
 st.markdown('<h1 class="logo-text">LungScan-AI</h1>', unsafe_allow_html=True)
-st.markdown('<p class="logo-subtext">Advanced Lung Cancer Detection Using Artificial Intelligence</p>', unsafe_allow_html=True)
+st.markdown('<h1 class="logo-subtext">Advanced Lung Cancer Detection Using Artificial Intelligence</h1>', unsafe_allow_html=True)
 
 def download_model():
     """Download the model file if it doesn't exist"""
@@ -390,21 +394,21 @@ def main():
         st.markdown("""
         <style>
             .consent-modal {
-                background-color: #f8f9fa;
-                border: 1px solid #dee2e6;
+                background-color: #31572c; #dark green
+                border: 4px solid #c1121f; #red
                 border-radius: 8px;
                 padding: 2rem;
                 margin: 1rem 0;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             }
             .consent-title {
-                color: #2c3e50;
+                color: #ffb703; #yellow
                 font-size: 1.5rem;
                 font-weight: 600;
                 margin-bottom: 1.2rem;
             }
             .consent-content {
-                color: #4a5568;
+                color: #edf6f9;
                 line-height: 1.6;
                 margin-bottom: 1.5rem;
             }
@@ -518,7 +522,7 @@ def main():
                     st.warning("⚠️ This is an AI generated prediction. Please consult a specialist before taking any step further.")
                     
                     # Display probability plot
-                    st.markdown("### Probability Distribution")
+                    st.markdown("<h3 style='color: #720026;'>Probability Distribution</h3>", unsafe_allow_html=True)
                     prob_fig = plot_probabilities(probabilities, class_names)
                     st.pyplot(prob_fig)
                     
