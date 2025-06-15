@@ -32,7 +32,7 @@ st.markdown("""
         padding: 0rem 0rem;
     }
     .stApp {
-        background-color: #0036fa;
+        background-color: #ffffff;
     }
     [data-testid="stSidebar"] {
         background-color: #ffd166;
@@ -48,7 +48,7 @@ st.markdown("""
         background-color: #ffd500;
         padding: 20px;
         border-radius: 10px;
-        border-color: #a4133c;
+        border-color: #ffd166;
         box-shadow: 4px 2px 4px rgba(0,3,4,0.7);
         margin: 20px 0;
     }
@@ -69,7 +69,7 @@ st.markdown("""
     .logo-text {
         font-size: 3em;
         font-weight: 700;
-        background: linear-gradient(45deg, #3B4371, #F3904F);
+        background: linear-gradient(45deg, #ffd166, #ffd500);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-align: center;
@@ -78,12 +78,12 @@ st.markdown("""
     }
     .logo-subtext {
         text-align: center;
-        color: #720026;
+        color: #ffd166;
         font-size: 4em;
         margin-bottom: 30px;
     }
     .consent-popup {
-        background-color: #ffbd00; #dark green
+        background-color: #ffd500;
         padding: 30px;
         border-radius: 10px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -94,13 +94,13 @@ st.markdown("""
     .consent-text {
         font-size: 1.1em;
         line-height: 1.6;
-        color: #ffd500;
+        color: #ffffff;
         margin-bottom: 25px;
         text-align: justify;
     }
     .restricted-message {
         background-color: #ffd500;
-        color: #ffd500;
+        color: #ffffff;
         padding: 15px;
         border-radius: 5px;
         margin: 10px 0;
