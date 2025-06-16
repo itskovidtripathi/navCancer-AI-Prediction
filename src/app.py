@@ -28,86 +28,240 @@ st.set_page_config(
 # Custom CSS with added styles for popup
 st.markdown("""
     <style>
+    /* Base styles */
     .main {
-        padding: 0rem 0rem;
+        padding: 0rem 1rem;
+        background-color: #f8f9fc;
     }
     .stApp {
-        background-color: #ffffff;
+        background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
     }
+    /* Sidebar styles */
     [data-testid="stSidebar"] {
-        background-color: #ffd166;
+        background-color: #1e3a8a;
     }
+    
+    /* Make ALL sidebar text white by default */
+    [data-testid="stSidebar"] * {
+        color: white !important;
+    }
+    
+    /* Override specific sidebar elements */
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] span {
+        color: white !important;
+    }
+    
+    [data-testid="stSidebar"] .st-emotion-cache-1q1n0ol {
+        color: white !important;
+    }
+    
+    [data-testid="stSidebar"] .st-emotion-cache-16idsys {
+        color: white !important;
+    }
+    
+    [data-testid="stSidebar"] .st-emotion-cache-pkbazv {
+        color: white !important;
+    }
+    
+    /* Keep headings blue */
+    [data-testid="stSidebar"] h2,
+    [data-testid="stSidebar"] h3 {
+        color: #60a5fa !important;
+        font-weight: 600;
+    }
+    
+    /* Consent popup styling */
+    .consent-modal {
+        background-color: #ffffff;
+        border: 1px solid rgba(59, 130, 246, 0.1);
+        border-left: 4px solid #3b82f6;
+        border-radius: 8px;
+        padding: 2rem;
+        margin: 1rem 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+    }
+    .consent-title {
+        color: #1e3a8a;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.2rem;
+    }
+    .consent-content {
+        color: #475569;
+        line-height: 1.6;
+    }
+    .consent-list {
+        color: #475569;
+        margin: 1rem 0;
+        padding-left: 1.5rem;
+    }
+    .consent-footer {
+        color: #64748b;
+        font-size: 0.875rem;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(59, 130, 246, 0.1);
+    }
+    
+    /* Button styling with more specific selectors */
+    button[data-testid="baseButton-primary"],
+    .stButton>button[kind="primary"],
+    .stButton>button[data-testid="primary-button"] {
+        background: #3b82f6 !important;
+        background-color: #3b82f6 !important;
+        background-image: none !important;
+        color: white !important;
+        border-radius: 6px !important;
+        padding: 0.5rem 1rem !important;
+        font-weight: 500 !important;
+        border: none !important;
+        transition: all 0.3s ease !important;
+    }
+
+    button[data-testid="baseButton-primary"]:hover,
+    .stButton>button[kind="primary"]:hover,
+    .stButton>button[data-testid="primary-button"]:hover {
+        background: #2563eb !important;
+        background-color: #2563eb !important;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15) !important;
+    }
+    
+    /* Secondary/Decline button styling with maximum specificity */
+    div[data-testid="stDecoration"] button[kind="secondary"],
+    button[kind="secondary"],
+    .stButton>button[data-testid="baseButton-secondary"] {
+        background-color: #f1f5f9 !important;
+        color: #475569 !important;
+        border: 1px solid #e2e8f0 !important;
+        box-shadow: none !important;
+    }
+
+    div[data-testid="stDecoration"] button[kind="secondary"]:hover,
+    button[kind="secondary"]:hover,
+    .stButton>button[data-testid="baseButton-secondary"]:hover {
+        background-color: #fee2e2 !important;
+        border-color: #ef4444 !important;
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+        outline: none !important;
+        border: 1px solid #ef4444 !important;
+    }
+
+    div[data-testid="stDecoration"] button[kind="secondary"]:focus,
+    button[kind="secondary"]:focus,
+    .stButton>button[data-testid="baseButton-secondary"]:focus {
+        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
+        border-color: #ef4444 !important;
+        outline: none !important;
+    }
+    
+    /* General styles */
     .upload-box {
-        border: 2px dashed #ffd166;
+        border: 2px dashed #3b82f6;
         padding: 20px;
-        border-radius: 10px;
+        border-radius: 8px;
         text-align: center;
         margin: 20px 0;
+        background-color: rgba(59, 130, 246, 0.02);
+        transition: all 0.3s ease;
+    }
+    .upload-box:hover {
+        border-color: #2563eb;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
     }
     .prediction-box {
-        background-color: #ffd500;
-        padding: 20px;
-        border-radius: 10px;
-        border-color: #ffd166;
-        box-shadow: 4px 2px 4px rgba(0,3,4,0.7);
+        background-color: #ffffff;
+        padding: 25px;
+        border-radius: 8px;
+        border-left: 4px solid #3b82f6;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
         margin: 20px 0;
+    }
+    .prediction-box:hover {
+        transform: translateY(-2px);
     }
     .metric-box {
-        background-color: #ffd500;
-        padding: 15px;
+        background-color: #ffffff;
+        padding: 20px;
         border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
         margin: 10px 0;
+        border-left: 4px solid #2563eb;
     }
     .user-form {
-        background-color: #ffd500;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        background-color: #ffffff;
+        padding: 25px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
         margin: 20px 0;
+        border: 1px solid rgba(59, 130, 246, 0.1);
     }
     .logo-text {
-        font-size: 3em;
+        font-size: 2.5em;
         font-weight: 700;
-        background: linear-gradient(45deg, #ffd166, #ffd500);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #1e3a8a;
         text-align: center;
         padding: 20px 0;
-        font-family: 'Arial Black', sans-serif;
+        font-family: 'Inter', sans-serif;
     }
     .logo-subtext {
         text-align: center;
-        color: #ffd166;
-        font-size: 4em;
+        color: #1e3a8a;
+        font-size: 1.2em;
         margin-bottom: 30px;
-    }
-    .consent-popup {
-        background-color: #ffd500;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        margin: 20px auto;
-        max-width: 800px;
-        text-align: center;
-    }
-    .consent-text {
-        font-size: 1.1em;
-        line-height: 1.6;
-        color: #ffffff;
-        margin-bottom: 25px;
-        text-align: justify;
+        font-weight: 500;
+        opacity: 0.9;
     }
     .restricted-message {
-        background-color: #ffd500;
+        background-color: rgba(229, 62, 62, 0.1);
+        color: #E53E3E;
+        padding: 20px;
+        border-radius: 12px;
+        margin: 15px 0;
+        text-align: left;
+        border-left: 4px solid #E53E3E;
+    }
+    .stTextInput>div>div>input {
+        border-radius: 8px;
+        border: 1px solid #E2E8F0;
+        padding: 0.6rem 1rem;
+    }
+    .stTextInput>div>div>input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+    [data-testid="stHeader"] {
+        background-color: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+    }
+    .stProgress > div > div > div > div {
+        background: linear-gradient(90deg, #1A365D, #2C7A7B);
+    }
+    div[data-testid="stToolbar"] {
+        display: none;
+    }
+    section[data-testid="stSidebar"] .stMarkdown {
         color: #ffffff;
-        padding: 15px;
-        border-radius: 5px;
-        margin: 10px 0;
-        text-align: center;
-        font-weight: bold;
+    }
+    
+    /* Sidebar tab styles */
+    [data-testid="stSidebar"] [data-testid="stTabBar"] button {
+        color: white !important;
+    }
+    
+    [data-testid="stSidebar"] [data-testid="stTabBar"] button[aria-selected="true"] {
+        color: white !important;
+        background-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    [data-testid="stSidebar"] [data-testid="stTabBar"] button:hover {
+        color: white !important;
+        background-color: rgba(255, 255, 255, 0.2) !important;
     }
     </style>
+    
+    <!-- Add Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     """, unsafe_allow_html=True)
 
 # Initialize session states
@@ -121,8 +275,8 @@ if 'show_consent_popup' not in st.session_state:
     st.session_state.show_consent_popup = True
 
 # Logo and Title
-st.markdown('<h1 class="logo-text">LungScan-AI</h1>', unsafe_allow_html=True)
-st.markdown('<h1 class="logo-subtext">Advanced Lung Cancer Detection Using Artificial Intelligence</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="logo-text">Advanced Lung Cancer Detection Using <br> Artificial Intelligence</h1>', unsafe_allow_html=True)
+# st.markdown('<h1 class="logo-subtext">Advanced Lung Cancer Detection Using Artificial Intelligence</h1>', unsafe_allow_html=True)
 
 def download_model():
     """Download the model file if it doesn't exist"""
@@ -392,36 +546,6 @@ def main():
     # Show consent popup if not already handled
     if st.session_state.show_consent_popup:
         st.markdown("""
-        <style>
-            .consent-modal {
-                background-color: #31572c; #dark green
-                border: 4px solid #c1121f; #red
-                border-radius: 8px;
-                padding: 2rem;
-                margin: 1rem 0;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            }
-            .consent-title {
-                color: #ffb703; #yellow
-                font-size: 1.5rem;
-                font-weight: 600;
-                margin-bottom: 1.2rem;
-            }
-            .consent-content {
-                color: #edf6f9;
-                line-height: 1.6;
-                margin-bottom: 1.5rem;
-            }
-            .consent-list {
-                margin: 0.8rem 0;
-                padding-left: 1.5rem;
-            }
-            .consent-button {
-                font-weight: 500 !important;
-                transition: all 0.2s ease !important;
-            }
-        </style>
-        
         <div class="consent-modal">
             <div class="consent-title">Professional Review Service Authorization</div>
             <div class="consent-content">
@@ -431,14 +555,17 @@ def main():
                     <li>Detailed diagnostic report with actionable insights</li>
                     <li>Personalized decision-support framework</li>
                 </ul>
-                <p>By proceeding, you agree to provide basic demographic information necessary for report generation. All data is protected under HIPAA compliance standards and used solely for diagnostic purposes.</p>
+                <p>By proceeding, you agree to provide basic demographic information necessary for report generation.</p>
+                <div class="consent-footer">
+                    All data is protected under HIPAA compliance standards and used solely for diagnostic purposes.
+                </div>
             </div>
-            <div class="consent-actions">
+        </div>
         """, unsafe_allow_html=True)
 
         col1, col2, col3 = st.columns([1, 2, 2])
         with col2:
-            if st.button("✓ I Agree to Terms", 
+            if st.button("✓ I Agree", 
                         use_container_width=True,
                         key="agree_btn",
                         type="primary",
@@ -447,15 +574,15 @@ def main():
                 st.session_state.show_consent_popup = False
                 st.rerun()
         with col3:
-            if st.button("✗ Decline Service", 
+            if st.button("✗ Decline", 
                         use_container_width=True,
                         key="disagree_btn",
+                        type="secondary",
                         help="Continue without expert review and report features"):
                 st.session_state.user_consent_given = False
                 st.session_state.show_consent_popup = False
                 st.rerun()
         
-        st.markdown("</div></div>", unsafe_allow_html=True)
         return
     # Header
     st.title("🫁 Lung Cancer Detection System")
@@ -602,4 +729,4 @@ def main():
                         st.rerun()
 
 if __name__ == "__main__":
-    main() 
+    main()
