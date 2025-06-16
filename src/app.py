@@ -28,240 +28,170 @@ st.set_page_config(
 # Custom CSS with added styles for popup
 st.markdown("""
     <style>
-    /* Base styles */
+    /* Design System Variables - Matching Website Theme */
+    :root {
+        --primary-yellow: #ffd166;      /* Main yellow from website */
+        --secondary-yellow: #ffa94d;    /* Darker yellow for contrast */
+        --accent-yellow: #ffe5b4;       /* Light yellow for accents */
+        --background-light: #fffdf7;    /* Very light warm background */
+        --text-dark: #2d3748;           /* Dark gray for text */
+        --text-secondary: #4a5568;      /* Secondary text color */
+        --danger: #dc2626;              /* Red for warnings/errors */
+        --success: #059669;             /* Green for success states */
+    }
+
+    /* Base Layout */
     .main {
-        padding: 0rem 1rem;
-        background-color: #f8f9fc;
+        padding: 2rem 3rem;
+        background: linear-gradient(135deg, var(--background-light) 0%, #ffffff 100%);
     }
+
     .stApp {
-        background: linear-gradient(135deg, #f8f9fc 0%, #ffffff 100%);
+        background: var(--background-light);
     }
-    /* Sidebar styles */
+
+    /* Sidebar */
     [data-testid="stSidebar"] {
-        background-color: #1e3a8a;
-    }
-    
-    /* Make ALL sidebar text white by default */
-    [data-testid="stSidebar"] * {
-        color: white !important;
-    }
-    
-    /* Override specific sidebar elements */
-    [data-testid="stSidebar"] [data-testid="stSidebarNav"] span {
-        color: white !important;
-    }
-    
-    [data-testid="stSidebar"] .st-emotion-cache-1q1n0ol {
-        color: white !important;
-    }
-    
-    [data-testid="stSidebar"] .st-emotion-cache-16idsys {
-        color: white !important;
-    }
-    
-    [data-testid="stSidebar"] .st-emotion-cache-pkbazv {
-        color: white !important;
-    }
-    
-    /* Keep headings blue */
-    [data-testid="stSidebar"] h2,
-    [data-testid="stSidebar"] h3 {
-        color: #60a5fa !important;
-        font-weight: 600;
-    }
-    
-    /* Consent popup styling */
-    .consent-modal {
-        background-color: #ffffff;
-        border: 1px solid rgba(59, 130, 246, 0.1);
-        border-left: 4px solid #3b82f6;
-        border-radius: 8px;
-        padding: 2rem;
-        margin: 1rem 0;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-    }
-    .consent-title {
-        color: #1e3a8a;
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 1.2rem;
-    }
-    .consent-content {
-        color: #475569;
-        line-height: 1.6;
-    }
-    .consent-list {
-        color: #475569;
-        margin: 1rem 0;
-        padding-left: 1.5rem;
-    }
-    .consent-footer {
-        color: #64748b;
-        font-size: 0.875rem;
-        margin-top: 1.5rem;
-        padding-top: 1rem;
-        border-top: 1px solid rgba(59, 130, 246, 0.1);
-    }
-    
-    /* Button styling with more specific selectors */
-    button[data-testid="baseButton-primary"],
-    .stButton>button[kind="primary"],
-    .stButton>button[data-testid="primary-button"] {
-        background: #3b82f6 !important;
-        background-color: #3b82f6 !important;
-        background-image: none !important;
-        color: white !important;
-        border-radius: 6px !important;
-        padding: 0.5rem 1rem !important;
-        font-weight: 500 !important;
-        border: none !important;
-        transition: all 0.3s ease !important;
+        background: linear-gradient(180deg, var(--primary-yellow) 0%, var(--secondary-yellow) 100%);
     }
 
-    button[data-testid="baseButton-primary"]:hover,
-    .stButton>button[kind="primary"]:hover,
-    .stButton>button[data-testid="primary-button"]:hover {
-        background: #2563eb !important;
-        background-color: #2563eb !important;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15) !important;
-    }
-    
-    /* Secondary/Decline button styling with maximum specificity */
-    div[data-testid="stDecoration"] button[kind="secondary"],
-    button[kind="secondary"],
-    .stButton>button[data-testid="baseButton-secondary"] {
-        background-color: #f1f5f9 !important;
-        color: #475569 !important;
-        border: 1px solid #e2e8f0 !important;
-        box-shadow: none !important;
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
+        color: var(--text-dark) !important;
+        font-weight: 500;
     }
 
-    div[data-testid="stDecoration"] button[kind="secondary"]:hover,
-    button[kind="secondary"]:hover,
-    .stButton>button[data-testid="baseButton-secondary"]:hover {
-        background-color: #fee2e2 !important;
-        border-color: #ef4444 !important;
-        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
-        outline: none !important;
-        border: 1px solid #ef4444 !important;
-    }
-
-    div[data-testid="stDecoration"] button[kind="secondary"]:focus,
-    button[kind="secondary"]:focus,
-    .stButton>button[data-testid="baseButton-secondary"]:focus {
-        box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2) !important;
-        border-color: #ef4444 !important;
-        outline: none !important;
-    }
-    
-    /* General styles */
-    .upload-box {
-        border: 2px dashed #3b82f6;
-        padding: 20px;
-        border-radius: 8px;
-        text-align: center;
-        margin: 20px 0;
-        background-color: rgba(59, 130, 246, 0.02);
-        transition: all 0.3s ease;
-    }
-    .upload-box:hover {
-        border-color: #2563eb;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
-    }
-    .prediction-box {
-        background-color: #ffffff;
-        padding: 25px;
-        border-radius: 8px;
-        border-left: 4px solid #3b82f6;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-        margin: 20px 0;
-    }
-    .prediction-box:hover {
-        transform: translateY(-2px);
-    }
-    .metric-box {
-        background-color: #ffffff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-        margin: 10px 0;
-        border-left: 4px solid #2563eb;
-    }
-    .user-form {
-        background-color: #ffffff;
-        padding: 25px;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
-        margin: 20px 0;
-        border: 1px solid rgba(59, 130, 246, 0.1);
-    }
+    /* Headers */
     .logo-text {
+        color: var(--text-dark);
         font-size: 2.5em;
         font-weight: 700;
-        color: #1e3a8a;
         text-align: center;
-        padding: 20px 0;
+        padding: 1.5rem 0;
+        margin-bottom: 0.5rem;
         font-family: 'Inter', sans-serif;
+        letter-spacing: -0.02em;
     }
-    .logo-subtext {
-        text-align: center;
-        color: #1e3a8a;
-        font-size: 1.2em;
-        margin-bottom: 30px;
-        font-weight: 500;
-        opacity: 0.9;
-    }
-    .restricted-message {
-        background-color: rgba(229, 62, 62, 0.1);
-        color: #E53E3E;
-        padding: 20px;
+
+    /* Cards and Containers - matching website cards */
+    .prediction-box {
+        background: white;
         border-radius: 12px;
-        margin: 15px 0;
-        text-align: left;
-        border-left: 4px solid #E53E3E;
+        padding: 2rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(255, 209, 102, 0.2);
+        transition: all 0.3s ease;
     }
-    .stTextInput>div>div>input {
+
+    .prediction-box:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 12px rgba(255, 209, 102, 0.1);
+    }
+
+    /* Buttons - matching website button style */
+    .stButton > button {
+        background: linear-gradient(45deg, var(--primary-yellow), var(--secondary-yellow)) !important;
+        color: var(--text-dark) !important;
+        font-weight: 600 !important;
+        padding: 0.75rem 1.5rem !important;
+        border-radius: 8px !important;
+        border: none !important;
+        transition: all 0.3s ease !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.875rem;
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 209, 102, 0.3);
+    }
+
+    /* Secondary/Decline button */
+    .stButton > button[kind="secondary"] {
+        background: white !important;
+        color: var(--danger) !important;
+        border: 2px solid var(--danger) !important;
+    }
+
+    .stButton > button[kind="secondary"]:hover {
+        background: var(--danger) !important;
+        color: white !important;
+    }
+
+    /* File uploader */
+    [data-testid="stFileUploader"] {
+        border: 2px dashed var(--primary-yellow);
+        border-radius: 12px;
+        padding: 2rem;
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+    [data-testid="stFileUploader"]:hover {
+        border-color: var(--secondary-yellow);
+        background: var(--background-light);
+    }
+
+    /* Consent modal */
+    .consent-modal {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        border: 1px solid rgba(255, 209, 102, 0.2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin: 1.5rem 0;
+    }
+
+    .consent-title {
+        color: var(--text-dark);
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid var(--primary-yellow);
+        padding-bottom: 0.5rem;
+    }
+
+    /* Form elements */
+    .stTextInput > div > div > input,
+    .stTextArea > div > div > textarea {
         border-radius: 8px;
-        border: 1px solid #E2E8F0;
-        padding: 0.6rem 1rem;
+        border: 1px solid var(--accent-yellow);
+        padding: 0.75rem 1rem;
+        transition: all 0.2s ease;
     }
-    .stTextInput>div>div>input:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+
+    .stTextInput > div > div > input:focus,
+    .stTextArea > div > div > textarea:focus {
+        border-color: var(--primary-yellow);
+        box-shadow: 0 0 0 2px rgba(255, 209, 102, 0.2);
     }
-    [data-testid="stHeader"] {
-        background-color: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(10px);
-        border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+
+    /* Alerts and messages */
+    .stAlert {
+        border-radius: 8px;
+        border-left: 4px solid var(--primary-yellow);
     }
-    .stProgress > div > div > div > div {
-        background: linear-gradient(90deg, #1A365D, #2C7A7B);
+
+    /* Navigation menu */
+    [data-testid="stSidebar"] [data-testid="stTabBar"] {
+        background: transparent;
     }
-    div[data-testid="stToolbar"] {
-        display: none;
-    }
-    section[data-testid="stSidebar"] .stMarkdown {
-        color: #ffffff;
-    }
-    
-    /* Sidebar tab styles */
+
     [data-testid="stSidebar"] [data-testid="stTabBar"] button {
-        color: white !important;
+        color: var(--text-dark) !important;
+        font-weight: 500 !important;
+        padding: 1rem !important;
     }
-    
-    [data-testid="stSidebar"] [data-testid="stTabBar"] button[aria-selected="true"] {
-        color: white !important;
-        background-color: rgba(255, 255, 255, 0.1) !important;
-    }
-    
+
     [data-testid="stSidebar"] [data-testid="stTabBar"] button:hover {
-        color: white !important;
-        background-color: rgba(255, 255, 255, 0.2) !important;
+        background: rgba(255, 255, 255, 0.1) !important;
     }
-    </style>
-    
-    <!-- Add Inter font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    [data-testid="stSidebar"] [data-testid="stTabBar"] button[aria-selected="true"] {
+        background: rgba(255, 255, 255, 0.2) !important;
+        border-left: 4px solid var(--text-dark) !important;
+    }
     """, unsafe_allow_html=True)
 
 # Initialize session states
