@@ -32,13 +32,13 @@ st.markdown("""
         padding: 0rem 0rem;
     }
     .stApp {
-        background-color: #ffffff;
+        background-color: #FFFFFF;
     }
     [data-testid="stSidebar"] {
         background-color: #ffd166;
     }
     .upload-box {
-        border: 2px dashed #ffd166;
+        border: 2px dashed #FFFCFB;
         padding: 20px;
         border-radius: 10px;
         text-align: center;
@@ -83,7 +83,7 @@ st.markdown("""
         margin-bottom: 30px;
     }
     .consent-popup {
-        background-color: #ffd500;
+        background-color: #F4F754;
         padding: 30px;
         border-radius: 10px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
