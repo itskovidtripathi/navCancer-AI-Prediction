@@ -73,12 +73,12 @@ st.markdown("""
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         text-align: center;
-        padding: 20px 0;
+        padding: 0 0;
         font-family: 'Arial Black', sans-serif;
     }
     .logo-subtext {
         text-align: center;
-        color: #ffd166;
+        color: #b68b00;
         font-size: 4em;
         margin-bottom: 30px;
     }
@@ -121,7 +121,7 @@ if 'show_consent_popup' not in st.session_state:
     st.session_state.show_consent_popup = True
 
 # Logo and Title
-st.markdown('<h1 class="logo-text">LungScan-AI</h1>', unsafe_allow_html=True)
+# st.markdown('<h1 class="logo-text">LungScan-AI</h1>', unsafe_allow_html=True)
 st.markdown('<h1 class="logo-subtext">Advanced Lung Cancer Detection Using Artificial Intelligence</h1>', unsafe_allow_html=True)
 
 def download_model():
@@ -394,7 +394,7 @@ def main():
         st.markdown("""
         <style>
             .consent-modal {
-                background-color: #31572c; #dark green
+                background-color: #b68b00; #dark green
                 border: 4px solid #c1121f; #red
                 border-radius: 8px;
                 padding: 2rem;
@@ -402,7 +402,7 @@ def main():
                 box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             }
             .consent-title {
-                color: #ffb703; #yellow
+                color: #000000; #black
                 font-size: 1.5rem;
                 font-weight: 600;
                 margin-bottom: 1.2rem;
