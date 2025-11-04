@@ -25,174 +25,174 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS with added styles for popup
-st.markdown("""
+# Add this after the imports
+if 'dark_mode' not in st.session_state:
+    st.session_state.dark_mode = False
+
+# Add this before any other content
+col1, col2, col3 = st.columns([1, 8, 1])
+with col1:
+    if st.button("🌓" if st.session_state.dark_mode else "🌞"):
+        st.session_state.dark_mode = not st.session_state.dark_mode
+        st.rerun()
+
+# Update the CSS to include dark mode
+st.markdown(f"""
     <style>
-    /* Design System Variables - Matching Website Theme */
-    :root {
-        --primary-yellow: #ffd166;      /* Main yellow from website */
-        --secondary-yellow: #ffa94d;    /* Darker yellow for contrast */
-        --accent-yellow: #ffe5b4;       /* Light yellow for accents */
-        --background-light: #fffdf7;    /* Very light warm background */
-        --text-dark: #2d3748;           /* Dark gray for text */
-        --text-secondary: #4a5568;      /* Secondary text color */
-        --danger: #dc2626;              /* Red for warnings/errors */
-        --success: #059669;             /* Green for success states */
-    }
+    /* Design System Variables - Dynamic Theme */
+    :root {{
+        /* Base colors */
+        --primary-yellow: {("#ffd166" if not st.session_state.dark_mode else "#ffd166")};
+        --background-color: {("#ffffff" if not st.session_state.dark_mode else "#1a1a1a")};
+        --text-color: {("#2D2D2D" if not st.session_state.dark_mode else "#ffffff")};
+        --text-secondary: {("#4a5568" if not st.session_state.dark_mode else "#a0aec0")};
+        --card-bg: {("#ffffff" if not st.session_state.dark_mode else "#2d2d2d")};
+        --border-color: {("#FFE5B4" if not st.session_state.dark_mode else "#404040")};
+        --accent-color: {("#FFB700" if not st.session_state.dark_mode else "#ffd166")};
+        --shadow-color: {("rgba(0,0,0,0.1)" if not st.session_state.dark_mode else "rgba(0,0,0,0.4)")};
+    }}
 
-    /* Base Layout */
-    .main {
-        padding: 2rem 3rem;
-        background: linear-gradient(135deg, var(--background-light) 0%, #ffffff 100%);
-    }
+    /* Global styles */
+    .stApp, .main {{
+        background: var(--background-color) !important;
+        color: var(--text-color) !important;
+    }}
 
-    .stApp {
-        background: var(--background-light);
-    }
+    /* Header styles */
+    h1, h2, h3, h4, h5, h6, .stMarkdown p {{
+        color: var(--text-color) !important;
+    }}
 
     /* Sidebar */
-    [data-testid="stSidebar"] {
-        background: linear-gradient(180deg, var(--primary-yellow) 0%, var(--secondary-yellow) 100%);
-    }
+    [data-testid="stSidebar"] {{
+        background-color: {"#ffd166" if not st.session_state.dark_mode else "#2d2d2d"} !important;
+    }}
 
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {
-        color: var(--text-dark) !important;
-        font-weight: 500;
-    }
+    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {{
+        color: {"#2D2D2D" if not st.session_state.dark_mode else "#ffffff"} !important;
+    }}
 
-    /* Headers */
-    .logo-text {
-        color: var(--text-dark);
-        font-size: 2.5em;
-        font-weight: 700;
-        text-align: center;
-        padding: 1.5rem 0;
-        margin-bottom: 0.5rem;
-        font-family: 'Inter', sans-serif;
-        letter-spacing: -0.02em;
-    }
-
-    /* Cards and Containers - matching website cards */
-    .prediction-box {
-        background: white;
-        border-radius: 12px;
-        padding: 2rem;
-        margin: 1.5rem 0;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        border: 1px solid rgba(255, 209, 102, 0.2);
-        transition: all 0.3s ease;
-    }
-
-    .prediction-box:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 12px rgba(255, 209, 102, 0.1);
-    }
-
-    /* Buttons - matching website button style */
-    .stButton > button {
-        background: linear-gradient(45deg, var(--primary-yellow), var(--secondary-yellow)) !important;
-        color: var(--text-dark) !important;
-        font-weight: 600 !important;
-        padding: 0.75rem 1.5rem !important;
-        border-radius: 8px !important;
-        border: none !important;
-        transition: all 0.3s ease !important;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        font-size: 0.875rem;
-    }
-
-    .stButton > button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(255, 209, 102, 0.3);
-    }
-
-    /* Secondary/Decline button */
-    .stButton > button[kind="secondary"] {
-        background: white !important;
-        color: var(--danger) !important;
-        border: 2px solid var(--danger) !important;
-    }
-
-    .stButton > button[kind="secondary"]:hover {
-        background: var(--danger) !important;
-        color: white !important;
-    }
-
-    /* File uploader */
-    [data-testid="stFileUploader"] {
-        border: 2px dashed var(--primary-yellow);
-        border-radius: 12px;
-        padding: 2rem;
-        background: white;
-        transition: all 0.3s ease;
-    }
-
-    [data-testid="stFileUploader"]:hover {
-        border-color: var(--secondary-yellow);
-        background: var(--background-light);
-    }
-
-    /* Consent modal */
-    .consent-modal {
-        background: white;
-        border-radius: 12px;
-        padding: 2rem;
-        border: 1px solid rgba(255, 209, 102, 0.2);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        margin: 1.5rem 0;
-    }
-
-    .consent-title {
-        color: var(--text-dark);
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin-bottom: 1.5rem;
-        border-bottom: 2px solid var(--primary-yellow);
-        padding-bottom: 0.5rem;
-    }
+    /* Cards and containers */
+    .prediction-box, .consent-modal, .user-form {{
+        background: var(--card-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        color: var(--text-color) !important;
+        box-shadow: 0 2px 6px var(--shadow-color) !important;
+    }}
 
     /* Form elements */
     .stTextInput > div > div > input,
-    .stTextArea > div > div > textarea {
-        border-radius: 8px;
-        border: 1px solid var(--accent-yellow);
-        padding: 0.75rem 1rem;
-        transition: all 0.2s ease;
-    }
+    .stTextArea > div > div > textarea {{
+        background-color: {("#ffffff" if not st.session_state.dark_mode else "#363636")} !important;
+        color: var(--text-color) !important;
+        border-color: var(--border-color) !important;
+    }}
 
-    .stTextInput > div > div > input:focus,
-    .stTextArea > div > div > textarea:focus {
-        border-color: var(--primary-yellow);
-        box-shadow: 0 0 0 2px rgba(255, 209, 102, 0.2);
-    }
+    /* File uploader */
+    [data-testid="stFileUploader"] {{
+        background-color: var(--card-bg) !important;
+        color: var(--text-color) !important;
+        border-color: var(--border-color) !important;
+    }}
+
+    [data-testid="stFileUploader"] p {{
+        color: var(--text-color) !important;
+    }}
+
+    /* Buttons */
+    .stButton > button {{
+        background-color: var(--primary-yellow) !important;
+        color: {"#2D2D2D" if not st.session_state.dark_mode else "#1a1a1a"} !important;
+    }}
+
+    /* Tables */
+    .stTable {{
+        background-color: var(--card-bg) !important;
+        color: var(--text-color) !important;
+    }}
 
     /* Alerts and messages */
-    .stAlert {
-        border-radius: 8px;
-        border-left: 4px solid var(--primary-yellow);
-    }
+    .stAlert {{
+        background-color: var(--card-bg) !important;
+        color: var(--text-color) !important;
+    }}
 
-    /* Navigation menu */
-    [data-testid="stSidebar"] [data-testid="stTabBar"] {
-        background: transparent;
-    }
+    /* Plots and visualizations */
+    .js-plotly-plot, .plotly {{
+        background-color: var(--card-bg) !important;
+    }}
 
-    [data-testid="stSidebar"] [data-testid="stTabBar"] button {
-        color: var(--text-dark) !important;
-        font-weight: 500 !important;
-        padding: 1rem !important;
-    }
+    .js-plotly-plot .mainsvg {{
+        background-color: var(--card-bg) !important;
+    }}
 
-    [data-testid="stSidebar"] [data-testid="stTabBar"] button:hover {
-        background: rgba(255, 255, 255, 0.1) !important;
-    }
+    /* Dropdown menus */
+    .stSelectbox > div > div {{
+        background-color: var(--card-bg) !important;
+        color: var(--text-color) !important;
+    }}
 
-    [data-testid="stSidebar"] [data-testid="stTabBar"] button[aria-selected="true"] {
-        background: rgba(255, 255, 255, 0.2) !important;
-        border-left: 4px solid var(--text-dark) !important;
-    }
-    """, unsafe_allow_html=True)
+    /* Toggle button */
+    button[data-testid="baseButton-secondary"] {{
+        background-color: {"#ffffff !important" if not st.session_state.dark_mode else "#363636 !important"};
+        color: var(--text-color) !important;
+        border: 1px solid var(--border-color) !important;
+    }}
+
+    /* Links */
+    a {{
+        color: var(--accent-color) !important;
+    }}
+
+    /* Toggle switch container */
+    .theme-switch {{
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1000;
+    }}
+
+    /* Expander */
+    .streamlit-expanderHeader {{
+        color: var(--text-color) !important;
+        background-color: var(--card-bg) !important;
+    }}
+
+    /* Code blocks */
+    .stCodeBlock {{
+        background-color: {"#f6f8fa" if not st.session_state.dark_mode else "#2b303b"} !important;
+    }}
+
+    /* Metric elements */
+    [data-testid="stMetricValue"] {{
+        color: var(--text-color) !important;
+    }}
+
+    /* Radio buttons and checkboxes */
+    .stRadio label, .stCheckbox label {{
+        color: var(--text-color) !important;
+    }}
+
+    /* Tooltips */
+    .stTooltipIcon {{
+        color: var(--text-secondary) !important;
+    }}
+
+    /* Progress bar */
+    .stProgress > div > div > div > div {{
+        background-color: var(--primary-yellow) !important;
+    }}
+
+    /* Success/Error messages */
+    .success {{
+        color: {"#059669" if not st.session_state.dark_mode else "#34D399"} !important;
+    }}
+
+    .error {{
+        color: {"#DC2626" if not st.session_state.dark_mode else "#F87171"} !important;
+    }}
+    </style>
+""", unsafe_allow_html=True)
 
 # Initialize session states
 if 'user_consent_given' not in st.session_state:
