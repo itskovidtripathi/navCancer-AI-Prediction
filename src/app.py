@@ -39,158 +39,85 @@ with col1:
 # Update the CSS to include dark mode
 st.markdown(f"""
     <style>
-    /* Design System Variables - Dynamic Theme */
-    :root {{
-        /* Base colors */
-        --primary-yellow: {("#ffd166" if not st.session_state.dark_mode else "#ffd166")};
-        --background-color: {("#ffffff" if not st.session_state.dark_mode else "#1a1a1a")};
-        --text-color: {("#2D2D2D" if not st.session_state.dark_mode else "#ffffff")};
-        --text-secondary: {("#4a5568" if not st.session_state.dark_mode else "#a0aec0")};
-        --card-bg: {("#ffffff" if not st.session_state.dark_mode else "#2d2d2d")};
-        --border-color: {("#FFE5B4" if not st.session_state.dark_mode else "#404040")};
-        --accent-color: {("#FFB700" if not st.session_state.dark_mode else "#ffd166")};
-        --shadow-color: {("rgba(0,0,0,0.1)" if not st.session_state.dark_mode else "rgba(0,0,0,0.4)")};
-    }}
-
-    /* Global styles */
-    .stApp, .main {{
-        background: var(--background-color) !important;
-        color: var(--text-color) !important;
-    }}
-
-    /* Header styles */
-    h1, h2, h3, h4, h5, h6, .stMarkdown p {{
-        color: var(--text-color) !important;
-    }}
-
-    /* Sidebar */
-    [data-testid="stSidebar"] {{
-        background-color: {"#ffd166" if not st.session_state.dark_mode else "#2d2d2d"} !important;
-    }}
-
-    [data-testid="stSidebar"] [data-testid="stMarkdownContainer"] p {{
-        color: {"#2D2D2D" if not st.session_state.dark_mode else "#ffffff"} !important;
-    }}
-
-    /* Cards and containers */
-    .prediction-box, .consent-modal, .user-form {{
-        background: var(--card-bg) !important;
-        border: 1px solid var(--border-color) !important;
-        color: var(--text-color) !important;
-        box-shadow: 0 2px 6px var(--shadow-color) !important;
-    }}
-
-    /* Form elements */
-    .stTextInput > div > div > input,
-    .stTextArea > div > div > textarea {{
-        background-color: {("#ffffff" if not st.session_state.dark_mode else "#363636")} !important;
-        color: var(--text-color) !important;
-        border-color: var(--border-color) !important;
-    }}
-
-    /* File uploader */
-    [data-testid="stFileUploader"] {{
-        background-color: var(--card-bg) !important;
-        color: var(--text-color) !important;
-        border-color: var(--border-color) !important;
-    }}
-
-    [data-testid="stFileUploader"] p {{
-        color: var(--text-color) !important;
-    }}
-
-    /* Buttons */
-    .stButton > button {{
-        background-color: var(--primary-yellow) !important;
-        color: {"#2D2D2D" if not st.session_state.dark_mode else "#1a1a1a"} !important;
-    }}
-
-    /* Tables */
-    .stTable {{
-        background-color: var(--card-bg) !important;
-        color: var(--text-color) !important;
-    }}
-
-    /* Alerts and messages */
-    .stAlert {{
-        background-color: var(--card-bg) !important;
-        color: var(--text-color) !important;
-    }}
-
-    /* Plots and visualizations */
-    .js-plotly-plot, .plotly {{
-        background-color: var(--card-bg) !important;
-    }}
-
-    .js-plotly-plot .mainsvg {{
-        background-color: var(--card-bg) !important;
-    }}
-
-    /* Dropdown menus */
-    .stSelectbox > div > div {{
-        background-color: var(--card-bg) !important;
-        color: var(--text-color) !important;
-    }}
-
-    /* Toggle button */
-    button[data-testid="baseButton-secondary"] {{
-        background-color: {"#ffffff !important" if not st.session_state.dark_mode else "#363636 !important"};
-        color: var(--text-color) !important;
-        border: 1px solid var(--border-color) !important;
-    }}
-
-    /* Links */
-    a {{
-        color: var(--accent-color) !important;
-    }}
-
-    /* Toggle switch container */
-    .theme-switch {{
-        position: fixed;
-        top: 1rem;
-        right: 1rem;
-        z-index: 1000;
-    }}
-
-    /* Expander */
-    .streamlit-expanderHeader {{
-        color: var(--text-color) !important;
-        background-color: var(--card-bg) !important;
-    }}
-
-    /* Code blocks */
-    .stCodeBlock {{
-        background-color: {"#f6f8fa" if not st.session_state.dark_mode else "#2b303b"} !important;
-    }}
-
-    /* Metric elements */
-    [data-testid="stMetricValue"] {{
-        color: var(--text-color) !important;
-    }}
-
-    /* Radio buttons and checkboxes */
-    .stRadio label, .stCheckbox label {{
-        color: var(--text-color) !important;
-    }}
-
-    /* Tooltips */
-    .stTooltipIcon {{
-        color: var(--text-secondary) !important;
-    }}
-
-    /* Progress bar */
-    .stProgress > div > div > div > div {{
-        background-color: var(--primary-yellow) !important;
-    }}
-
-    /* Success/Error messages */
-    .success {{
-        color: {"#059669" if not st.session_state.dark_mode else "#34D399"} !important;
-    }}
-
-    .error {{
-        color: {"#DC2626" if not st.session_state.dark_mode else "#F87171"} !important;
-    }}
+    .main {
+        padding: 0rem 0rem;
+    }
+    .stApp {
+        background-color: #FFFFFF;
+    }
+    [data-testid="stSidebar"] {
+        background-color: #ffd166;
+    }
+    .upload-box {
+        border: 2px dashed #FFFCFB;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        margin: 20px 0;
+    }
+    .prediction-box {
+        background-color: #ffd500;
+        padding: 20px;
+        border-radius: 10px;
+        border-color: #ffd166;
+        box-shadow: 4px 2px 4px rgba(0,3,4,0.7);
+        margin: 20px 0;
+    }
+    .metric-box {
+        background-color: #ffd500;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin: 10px 0;
+    }
+    .user-form {
+        background-color: #ffd500;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin: 20px 0;
+    }
+    .logo-text {
+        font-size: 3em;
+        font-weight: 700;
+        background: linear-gradient(45deg, #ffd166, #ffd500);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-align: center;
+        padding: 0 0;
+        font-family: 'Arial Black', sans-serif;
+    }
+    .logo-subtext {
+        text-align: center;
+        color: #b68b00;
+        font-size: 4em;
+        margin-bottom: 30px;
+    }
+    .consent-popup {
+        background-color: #F4F754;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        margin: 20px auto;
+        max-width: 800px;
+        text-align: center;
+    }
+    .consent-text {
+        font-size: 1.1em;
+        line-height: 1.6;
+        color: #ffffff;
+        margin-bottom: 25px;
+        text-align: justify;
+    }
+    .restricted-message {
+        background-color: #ffd500;
+        color: #ffffff;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 10px 0;
+        text-align: center;
+        font-weight: bold;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -205,8 +132,8 @@ if 'show_consent_popup' not in st.session_state:
     st.session_state.show_consent_popup = True
 
 # Logo and Title
-st.markdown('<h1 class="logo-text">Advanced Lung Cancer Detection Using <br> Artificial Intelligence</h1>', unsafe_allow_html=True)
-# st.markdown('<h1 class="logo-subtext">Advanced Lung Cancer Detection Using Artificial Intelligence</h1>', unsafe_allow_html=True)
+# st.markdown('<h1 class="logo-text">LungScan-AI</h1>', unsafe_allow_html=True)
+st.markdown('<h1 class="logo-subtext">Advanced Lung Cancer Detection Using Artificial Intelligence</h1>', unsafe_allow_html=True)
 
 def download_model():
     """Download the model file if it doesn't exist"""
@@ -476,6 +403,36 @@ def main():
     # Show consent popup if not already handled
     if st.session_state.show_consent_popup:
         st.markdown("""
+        <style>
+            .consent-modal {
+                background-color: #b68b00; #dark green
+                border: 4px solid #c1121f; #red
+                border-radius: 8px;
+                padding: 2rem;
+                margin: 1rem 0;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            .consent-title {
+                color: #000000; #black
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 1.2rem;
+            }
+            .consent-content {
+                color: #edf6f9;
+                line-height: 1.6;
+                margin-bottom: 1.5rem;
+            }
+            .consent-list {
+                margin: 0.8rem 0;
+                padding-left: 1.5rem;
+            }
+            .consent-button {
+                font-weight: 500 !important;
+                transition: all 0.2s ease !important;
+            }
+        </style>
+        
         <div class="consent-modal">
             <div class="consent-title">Professional Review Service Authorization</div>
             <div class="consent-content">
